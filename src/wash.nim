@@ -1,4 +1,4 @@
-#[  
+#[
     | wash.exe - Windows Advanced Shell
     | Copyright (c) segf4ultk1nger, SIFWARE 2026
     | Licensed under AGPL-3.
@@ -87,7 +87,18 @@ proc wash_readline(): tuple[ok: bool, line: string] =
   proc dropLastRune() =
     if lineRunes.len > 0:
       discard lineRunes.pop()
-      stdout.write("\x08 \x08")
+      let hStdout = GetStdHandle(STD_OUTPUT_HANDLE)
+      if hStdout == INVALID_HANDLE_VALUE: return
+      var csbi: CONSOLE_SCREEN_BUFFER_INFO
+      # use fucking console api to simulate backscape for better compatibility.
+      if GetConsoleScreenBufferInfo(hStdout, &csbi):
+        var cursorCoord = csbi.dwCursorPosition
+        if cursorCoord.X > 0:
+          cursorCoord.X -= 1
+          SetConsoleCursorPosition(hStdout, cursorCoord)
+          stdout.write(" ")
+          stdout.flushFile()
+          SetConsoleCursorPosition(hStdout, cursorCoord)
       flushFile(stdout)
 
   while true:
@@ -132,7 +143,7 @@ proc wash_readline(): tuple[ok: bool, line: string] =
       pendingHighSurrogate = int(keyChar)
     elif keyChar >= 0xDC00 and keyChar <= 0xDFFF:
       if pendingHighSurrogate >= 0:
-        let codePoint = 0x10000 + 
+        let codePoint = 0x10000 +
           (((pendingHighSurrogate - 0xD800) shl 10) or (int(keyChar) - 0xDC00))
         appendRune(Rune(codePoint))
         pendingHighSurrogate = -1

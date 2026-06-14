@@ -1,0 +1,4 @@
+build/
+nimcache/
+nimcache_*
+.nimble/
