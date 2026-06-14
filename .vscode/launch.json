@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "debug wash.exe",
+            "preLaunchTask": "build wash.exe for debugging",
+            "program": "${workspaceFolder}/build/washdebug.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+        }
+    ]
+}

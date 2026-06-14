@@ -1,0 +1,85 @@
+================================================================================
+                                   $$\                                        
+                                   $$ |                                       
+ $$\  $$\  $$\  $$$$$$\   $$$$$$$\ $$$$$$$\      $$$$$$\  $$\   $$\  $$$$$$\  
+ $$ | $$ | $$ | \____$$\ $$  _____|$$  __$$\    $$  __$$\ \$$\ $$  |$$  __$$\ 
+ $$ | $$ | $$ | $$$$$$$ |\$$$$$$\  $$ |  $$ |   $$$$$$$$ | \$$$$  / $$$$$$$$ |
+ $$ | $$ | $$ |$$  __$$ | \____$$\ $$ |  $$ |   $$   ____| $$  $$<  $$   ____|
+ \$$$$$\$$$$  |\$$$$$$$ |$$$$$$$  |$$ |  $$ |$$\\$$$$$$$\ $$  /\$$\ \$$$$$$$\ 
+  \_____\____/  \_______|\_______/ \__|  \__|\__|\_______|\__/  \__| \_______|
+--------------------------------------------------------------------------------
+                       wash.exe -- Windows Advanced Shell
+================================================================================
+
+________________________________________________________________________________
+********************************************************************************
+ We need donation! If my project be of great help for you, consider donate it.
+                      ==> https://washdotexe.sfkgr.me <===
+
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+________________________________________________________________________________
+********************************************************************************
+                 The project is still under active development.
+             It has not yet reached a stage of stable availability.
+
+<!> -------------------- THINK TWICE before you use it. -------------------- <!>
+________________________________________________________________________________
+
+
+
+[DESCRIPTION]___________________________________________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+wash.exe is a lightweigt, powerful Windows shell designed for nerd hackers and 
+daily windows drivers.
+
+Inspired by the Swiss Army Knife philosophy of BusyBox and the robust object-
+oriented capabilities of PowerShell, wash.exe brings a fast, single-file, and 
+modern command-line experience to Windows without the fucking stupid POSIX 
+simulations and heavy footprints.
+
+
+[FEATURES]______________________________________________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+* Just Single-File Binary: Fucking TINY footprints, no .NET dependencies or any 
+  shit codes inside, just pure single-file binary with lowest memory footprints.
+
+* BusyBox-like Builtins: Includes standard Unix-like utilities (ls, grep, awk, 
+  sed, cat) natively inside one executable (but NOT 100% coreutils-compatible)
+
+* Object Pipeline: Pass structured data through pipes, not just raw text (which
+  is heavily inspired by PowerShell and Nushell.)
+
+* IntelliSense: Just like IntelliSense in Visual Studio, it provides real-time
+  command completion and contextual awareness down to the parameter type.
+
+* Low Resource Usage: Boots instantly, ideal for WinPE or rescue environments.
+
+* Support Windows7: Supports Windows 7 and later systems, and supports both the 
+  Windows Console API and ConPTY (not pure ConPTY!).
+
+
+[INSTALLATION]__________________________________________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+( Method 1 ) Just drop `wash.exe` into your PATH and run it:
+
+    > wash.exe
+
+( Method 2 ) Open your Powershell and type following command:
+
+    > irm x.sfkgr.me/wash.ps1 | iex
+
+( Method 3 ) Use your favorite package manager:
+
+    > winget install Sifware.WashDotExe
+    > # or if you preferred `scoop`:
+    > scoop install washdotexe
+
+
+[LICENSE]_______________________________________________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Distributed under the AGPL-3 License. See `LICENSE` file for more information.
+Copyright (c) 2026 segf4ultk1nger, SIFWARE. All rights reserved.
+
+
+================================================================================
+EOF - Thanks for using wash.exe!

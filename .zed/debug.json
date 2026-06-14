@@ -1,0 +1,19 @@
+[
+  {
+    "label": "Debug wash.exe",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/build/washdebug.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "build": {
+      "command": "nim",
+      "args": [
+        "c",
+        "-g",
+        "--debugger:native",
+        "--out:build/washdebug.exe",
+        "src/wash.nim",
+      ],
+    },
+  },
+]
