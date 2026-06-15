@@ -2,3 +2,4 @@ build/
 nimcache/
 nimcache_*
 .nimble/
+.exe
