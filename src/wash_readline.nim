@@ -1,3 +1,9 @@
+#[
+    | wash.exe - Windows Advanced Shell
+    | Copyright (c) segf4ultk1nger, SIFWARE 2026
+    | Licensed under AGPL-3.
+]#
+
 import winim/lean, std/unicode
 import wash_textarea, wash_conutils
 

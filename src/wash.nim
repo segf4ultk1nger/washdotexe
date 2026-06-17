@@ -4,24 +4,22 @@
     | Licensed under AGPL-3.
 ]#
 
-import strutils, osproc, std/unicode
-import winim/lean
+import strutils, osproc, std/unicode, std/[os, ospaths, strformat]
+import winim/mean
 import wash_conutils
 import wash_readline
+import wash_prompting
+import wash_env
 
 var ctrlcInterrupted {.volatile.}: bool = false
 var promptPrinted {.volatile.}: bool = false
-
-# keep this stupid prompt function
-proc wash_prompting() =
-  stdout.write("wash>")
 
 # handle ctrl key for SetConsoleCtrlHandler
 proc wash_ctrl_handler_native(ctrl_type: DWORD): WINBOOL {.stdcall.} =
   if ctrl_type in [CTRL_C_EVENT, CTRL_BREAK_EVENT]:
     stdout.write("^C\r\n")
     wash_prompting() # immediately display prompt text so that there is no extra
-                     # delay for the prompt display.
+                          # delay for the prompt display.
     flushFile(stdout)
     ctrlcInterrupted = true
     promptPrinted = true
@@ -65,12 +63,16 @@ proc wash_repl() =
   wash_handlectrl(true)
   enableUTF8ConsoleCP()
 
+  var t: Thread[void]
+  createThread(t, envListenerThread)
+
   # welcome messages, hard-coded just for my laziness LOL.
   stdout.writeLine("washdotexe-alpha0.0.1")
   stdout.writeLine("Type 'exit' to close, Ctrl+C to interrupt")
   stdout.writeLine("")
 
   while true:
+
     ctrlcInterrupted = false
 
     if promptPrinted:
@@ -103,6 +105,18 @@ proc wash_repl() =
     elif cmd == "fuck":
       if (args.len>0 and args[0] == "you"):
         echo "fuck segf4ultk1nger"
+    elif cmd == "cd":
+      if (args.len>0 and args[0].strip != ""):
+        let path = args[0].strip
+        let normalizedPath = path.normalizedPath()
+        let targetDir = if normalizedPath.isEmptyOrWhitespace: getHomeDir() else: normalizedPath
+        try:
+          if not dirExists(targetDir):
+            echo fmt"No such file or directory: {targetDir}"
+            continue
+          setCurrentDir(targetDir)
+        except OSError as e:
+          echo fmt"OSError: {e.msg}"
     elif cmd == "clear":
       wash_clear_screen()
     else:
