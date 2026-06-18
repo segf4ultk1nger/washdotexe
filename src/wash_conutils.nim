@@ -4,6 +4,9 @@
     | Licensed under AGPL-3.
 ]#
 
+# this module is obsolete, but external calls to it have not yet been fully 
+# migrated to new `wash_console.nim` module.
+
 import winim/lean
 
 proc showConsoleCursor*(hStdout: HANDLE, show: bool) =
@@ -15,12 +18,10 @@ proc showConsoleCursor*(hStdout: HANDLE, show: bool) =
     discard SetConsoleCursorInfo(hStdout, addr cursorInfo)
 
 # console cps
-var originalConsoleCP: UINT = 0
-var originalConsoleOutputCP: UINT = 0
+var originalConsoleCP: UINT = GetConsoleCP()
+var originalConsoleOutputCP: UINT = GetConsoleOutputCP()
 
 proc enableUTF8ConsoleCP*() =
-  originalConsoleCP = GetConsoleCP()
-  originalConsoleOutputCP = GetConsoleOutputCP()
   discard SetConsoleCP(CP_UTF8)
   discard SetConsoleOutputCP(CP_UTF8)
 

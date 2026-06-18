@@ -11,6 +11,7 @@ import wash_readline
 import wash_prompting
 import wash_env
 import wash_commands
+import wash_console
 
 var ctrlcInterrupted {.volatile.}: bool = false
 var promptPrinted {.volatile.}: bool = false
@@ -35,54 +36,54 @@ proc wash_handlectrl(is_handle: bool)=
 proc wash_repl() =
   # firstly handle ctrl keys
   wash_handlectrl(true)
-  enableUTF8ConsoleCP()
+  washConsoleSingleton.withState do():
+    washConsoleSingleton.consoleOutputCP = 65001
+    var t: Thread[void]
+    createThread(t, envListenerThread)
 
-  var t: Thread[void]
-  createThread(t, envListenerThread)
+    const WashVersion {.strdefine.}: string = "0.0.1-dev"
 
-  const WashVersion {.strdefine.}: string = "0.0.1-dev"
+    # welcome messages, hard-coded just for my laziness LOL.
+    stdout.writeLine("washell[wash.exe] " & WashVersion & 
+      (if washConsoleSingleton.isConsoleClean: " *c" else: " *d"))
+    stdout.writeLine("`wash.exe` is highly unstable. Use with caution.")
+    stdout.writeLine("")
 
-  # welcome messages, hard-coded just for my laziness LOL.
-  stdout.writeLine("washell[wash.exe] " & WashVersion)
-  stdout.writeLine("`wash.exe` is highly unstable. Use with caution.")
-  stdout.writeLine("")
+    while true:
 
-  while true:
+      ctrlcInterrupted = false
 
-    ctrlcInterrupted = false
+      if promptPrinted:
+        promptPrinted = false
+      else:
+        wash_prompting()
+        flushFile(stdout)
 
-    if promptPrinted:
-      promptPrinted = false
-    else:
-      wash_prompting()
-      flushFile(stdout)
+      # let's readline XD
+      let result = wash_readline(ctrlcInterrupted)
+      if not result.ok:
+        if ctrlcInterrupted:
+          ctrlcInterrupted = false
+          continue
 
-    # let's readline XD
-    let result = wash_readline(ctrlcInterrupted)
-    if not result.ok:
-      if ctrlcInterrupted:
-        ctrlcInterrupted = false
+      var line = result.line
+      line = line.strip
+      if line.len == 0:
         continue
 
-    var line = result.line
-    line = line.strip
-    if line.len == 0:
-      continue
+      let parts = strutils.splitWhitespace(line)
+      let cmd = parts[0]
+      let args: seq[string] = if parts.len > 1: parts[1..^1] else: @[]
 
-    let parts = strutils.splitWhitespace(line)
-    let cmd = parts[0]
-    let args: seq[string] = if parts.len > 1: parts[1..^1] else: @[]
-
-    let res = handle_command(cmd, args, wash_handlectrl)
-    
-    if res.shouldExit:
-      break
-    
-    if res.promptPrinted:
-      promptPrinted = true
+      let res = handle_command(cmd, args, wash_handlectrl)
+      
+      if res.shouldExit:
+        break
+      
+      if res.promptPrinted:
+        promptPrinted = true
 
 
 # main entry
 when isMainModule:
   wash_repl()
-  restoreUTF8ConsoleCP()

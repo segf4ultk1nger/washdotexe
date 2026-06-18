@@ -5,14 +5,16 @@
 ]#
 
 import winim/lean, std/unicode
-import wash_textarea, wash_conutils
+import wash_textarea
+import wash_console
 
 # redraw a whole prompt line
+# TODO: move to wash_console module
 proc redrawLine(hStdout: HANDLE, startCoord: COORD, ta: wash_textarea) =
   var csbi: CONSOLE_SCREEN_BUFFER_INFO
   if GetConsoleScreenBufferInfo(hStdout, addr csbi) == 0: return
 
-  hStdout.showConsoleCursor(false)
+  washConsoleSingleton.cursorIsVisible = false
   SetConsoleCursorPosition(hStdout, startCoord)
 
   const 
@@ -52,12 +54,12 @@ proc redrawLine(hStdout: HANDLE, startCoord: COORD, ta: wash_textarea) =
     else: targetX += 1
     
   SetConsoleCursorPosition(hStdout, COORD(X: targetX, Y: startCoord.Y))
-  hStdout.showConsoleCursor(true)
+  washConsoleSingleton.cursorIsVisible = true
 
-#readline module
+# TODO: move to wash_console module
 proc wash_readline*(ctrlcInterrupted:bool): tuple[ok: bool, line: string] =
-  var hStdin = GetStdHandle(STD_INPUT_HANDLE)
-  var hStdout = GetStdHandle(STD_OUTPUT_HANDLE)
+  var hStdin = washConsoleSingleton.hStdin
+  var hStdout = washConsoleSingleton.hStdout
   var inputRecord: INPUT_RECORD
   var numRead: DWORD
   
