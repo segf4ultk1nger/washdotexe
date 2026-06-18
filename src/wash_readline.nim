@@ -15,32 +15,43 @@ proc redrawLine(hStdout: HANDLE, startCoord: COORD, ta: wash_textarea) =
   hStdout.showConsoleCursor(false)
   SetConsoleCursorPosition(hStdout, startCoord)
 
-  # fill right space to the blank
+  const 
+    DefaultAttr = FOREGROUND_RED or FOREGROUND_GREEN or FOREGROUND_BLUE
+    SelectedAttr = BACKGROUND_RED or BACKGROUND_GREEN or BACKGROUND_BLUE
+
   let consoleWidth = csbi.dwSize.X - startCoord.X
   var dwCharsWritten: DWORD
   FillConsoleOutputCharacter(hStdout, ' '.ord.TCHAR, consoleWidth.int32, 
     startCoord, addr dwCharsWritten)
+  FillConsoleOutputAttribute(hStdout, DefaultAttr, consoleWidth.int32, 
+    startCoord, addr dwCharsWritten)
 
-  # output blank text
-  var fullText = ""
-  for r in ta.text:
-    fullText.add(r.toUTF8)
-  stdout.write(fullText)
-  stdout.flushFile()
+  let sLeft = ta.selLeft()
+  let sRight = ta.selRight()
+  
+  var currentX = startCoord.X
+  for i in 0 ..< ta.text.len:
+    let isSelected = ta.hasSelection and (i >= sLeft and i < sRight)
+    
+    if isSelected:
+      SetConsoleTextAttribute(hStdout, SelectedAttr)
+    else:
+      SetConsoleTextAttribute(hStdout, DefaultAttr)
+    
+    let cStr = ta.text[i].toUTF8
+    var written: DWORD
+    WriteConsoleA(hStdout, addr(cStr[0]), cStr.len.DWORD, addr written, nil)
+    
+    if cStr.len >= 3: currentX += 2
+    else: currentX += 1
 
-  # caculating textarea cursor position with runes caculations.
+  SetConsoleTextAttribute(hStdout, DefaultAttr)
   var targetX = startCoord.X
   for i in 0 ..< ta.cursor:
-    # cjk is 2 colums size
-    if ta.text[i].toUTF8.len >= 3:
-      targetX += 2
-    else:
-      targetX += 1
-
-  # set cursor pos to textarea cursor pos.
-  let targetCoord = COORD(X: targetX, Y: startCoord.Y)
-  SetConsoleCursorPosition(hStdout, targetCoord)
-
+    if ta.text[i].toUTF8.len >= 3: targetX += 2
+    else: targetX += 1
+    
+  SetConsoleCursorPosition(hStdout, COORD(X: targetX, Y: startCoord.Y))
   hStdout.showConsoleCursor(true)
 
 #readline module
@@ -80,6 +91,8 @@ proc wash_readline*(ctrlcInterrupted:bool): tuple[ok: bool, line: string] =
     let keyCode = keyEvent.wVirtualKeyCode
     let keyChar = keyEvent.uChar.UnicodeChar
 
+    let isShiftPressed = (keyEvent.dwControlKeyState and SHIFT_PRESSED) != 0
+
     # key event handle
     if keyCode == VK_RETURN: # new line with prompt when user hit Enter.
       stdout.writeLine("")
@@ -99,11 +112,27 @@ proc wash_readline*(ctrlcInterrupted:bool): tuple[ok: bool, line: string] =
       redrawLine(hStdout, startCoord, ta)
 
     elif keyCode == VK_LEFT: # left key to move left
+      if (isShiftPressed):
+        if (ta.hasSelection == false):
+          ta.hasSelection = true
+          ta.anchor = ta.cursor
+      else:
+        if (ta.hasSelection == true):
+          ta.hasSelection = false
+          ta.anchor = 0
       pendingHighSurrogate = -1
       ta.move(-1)
       redrawLine(hStdout, startCoord, ta)
 
     elif keyCode == VK_RIGHT: # right key to move right
+      if (isShiftPressed):
+        if (ta.hasSelection == false):
+          ta.hasSelection = true
+          ta.anchor = ta.cursor
+      else:
+        if (ta.hasSelection == true):
+          ta.hasSelection = false
+          ta.anchor = 0
       pendingHighSurrogate = -1
       ta.move(1)
       redrawLine(hStdout, startCoord, ta)

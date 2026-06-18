@@ -104,9 +104,9 @@ proc initEnvironmentAutoRefresh() =
 
   if hwnd == 0:
     # stupid ideas, shell should never echo message directly into stdout.
-    echo "Warning[wash_env]: Unable to create environment variable " &
-         "listeners, automatic environment variable refresh will " &
-         "not work properly!"
+    # echo "Warning[wash_env]: Unable to create environment variable " &
+    #      "listeners, automatic environment variable refresh will " &
+    #      "not work properly!"
     return
 
   var msg: MSG

@@ -19,7 +19,7 @@ proc wash_ctrl_handler_native(ctrl_type: DWORD): WINBOOL {.stdcall.} =
   if ctrl_type in [CTRL_C_EVENT, CTRL_BREAK_EVENT]:
     stdout.write("^C\r\n")
     wash_prompting() # immediately display prompt text so that there is no extra
-                          # delay for the prompt display.
+                     # delay for the prompt display.
     flushFile(stdout)
     ctrlcInterrupted = true
     promptPrinted = true
@@ -66,9 +66,11 @@ proc wash_repl() =
   var t: Thread[void]
   createThread(t, envListenerThread)
 
+  const WashVersion {.strdefine.}: string = "0.0.1-dev"
+
   # welcome messages, hard-coded just for my laziness LOL.
-  stdout.writeLine("washdotexe-alpha0.0.1")
-  stdout.writeLine("Type 'exit' to close, Ctrl+C to interrupt")
+  stdout.writeLine("wash.exe " & WashVersion)
+  stdout.writeLine("`wash.exe` is highly unstable. Use with caution.")
   stdout.writeLine("")
 
   while true:

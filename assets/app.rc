@@ -1,0 +1,27 @@
+﻿101 ICON "washicon.ico"
+
+1 VERSIONINFO
+FILEVERSION     #FILE_VERSION#
+PRODUCTVERSION  #FILE_VERSION#
+FILEOS          0x40004    // VOS_NT_WINDOWS32
+FILETYPE        0x1        // VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "SIFWARE"
+            VALUE "FileDescription",  "Windows Advanced Shell"
+            VALUE "FileVersion",      "#STR_VERSION#"
+            VALUE "InternalName",     "washdotexe"
+            VALUE "LegalCopyright",   "Copyright (c) 2026 segf4ultk1nger, SIFWARE. All rights reserved."
+            VALUE "OriginalFilename", "wash.exe"
+            VALUE "ProductName",      "washdotexe"
+            VALUE "ProductVersion",   "#STR_VERSION#"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

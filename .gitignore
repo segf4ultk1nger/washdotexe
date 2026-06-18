@@ -3,3 +3,5 @@ nimcache/
 nimcache_*
 .nimble/
 .exe
+assets/app.res
+app_compiled.rc
