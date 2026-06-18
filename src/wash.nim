@@ -10,6 +10,7 @@ import wash_conutils
 import wash_readline
 import wash_prompting
 import wash_env
+import wash_commands
 
 var ctrlcInterrupted {.volatile.}: bool = false
 var promptPrinted {.volatile.}: bool = false
@@ -30,33 +31,6 @@ proc wash_ctrl_handler_native(ctrl_type: DWORD): WINBOOL {.stdcall.} =
 proc wash_handlectrl(is_handle: bool)=
   discard SetConsoleCtrlHandler(wash_ctrl_handler_native, TRUE)
 
-
-# builtin command: clear
-proc wash_clear_screen() =
-  # get stdout handle
-  let hStdout = GetStdHandle(STD_OUTPUT_HANDLE)
-  if hStdout == INVALID_HANDLE_VALUE: return
-
-  # get console screen buffer info
-  var csbi: CONSOLE_SCREEN_BUFFER_INFO
-  if GetConsoleScreenBufferInfo(hStdout, addr csbi) == 0: return
-
-  # caculate rect buffer size
-  let dwSize = csbi.dwSize.X.int32 * csbi.dwSize.Y.int32
-  var dwCharsWritten: DWORD
-  let coord0 = COORD(X: 0, Y: 0)
-
-  FillConsoleOutputCharacter(hStdout, ' '.ord.TCHAR, dwSize, coord0,
-    addr dwCharsWritten) # fill the whole buffer with void
-  FillConsoleOutputAttribute(hStdout, csbi.wAttributes, dwSize, coord0,
-    addr dwCharsWritten) # also reset the attributes
-  SetConsoleCursorPosition(hStdout, coord0) # set cursor pos to (0,0)
-
-  # immediately display prompt to remove extra delay.
-  wash_prompting()
-  promptPrinted = true
-
-
 # repl module
 proc wash_repl() =
   # firstly handle ctrl keys
@@ -69,7 +43,7 @@ proc wash_repl() =
   const WashVersion {.strdefine.}: string = "0.0.1-dev"
 
   # welcome messages, hard-coded just for my laziness LOL.
-  stdout.writeLine("wash.exe " & WashVersion)
+  stdout.writeLine("washell[wash.exe] " & WashVersion)
   stdout.writeLine("`wash.exe` is highly unstable. Use with caution.")
   stdout.writeLine("")
 
@@ -99,44 +73,13 @@ proc wash_repl() =
     let cmd = parts[0]
     let args: seq[string] = if parts.len > 1: parts[1..^1] else: @[]
 
-    # some fucking stupid hard-coded builtins
-    if cmd == "exit":
+    let res = handle_command(cmd, args, wash_handlectrl)
+    
+    if res.shouldExit:
       break
-    elif cmd == "echo":
-      echo args.join(" ")
-    elif cmd == "fuck":
-      if (args.len>0 and args[0] == "you"):
-        echo "fuck segf4ultk1nger"
-    elif cmd == "cd":
-      if (args.len>0 and args[0].strip != ""):
-        let path = args[0].strip
-        let normalizedPath = path.normalizedPath()
-        let targetDir = if normalizedPath.isEmptyOrWhitespace: getHomeDir() else: normalizedPath
-        try:
-          if not dirExists(targetDir):
-            echo fmt"No such file or directory: {targetDir}"
-            continue
-          setCurrentDir(targetDir)
-        except OSError as e:
-          echo fmt"OSError: {e.msg}"
-    elif cmd == "clear":
-      wash_clear_screen()
-    else:
-      try:
-        wash_handlectrl(false) # firstly disable ctrl handler for wash
-
-        let p = startProcess(
-          cmd,
-          args = args,
-          options = {poUsePath, poParentStreams} # use wash's stdio handles
-        )
-
-        discard p.waitForExit()
-        p.close()
-
-        wash_handlectrl(true) # recover the ctrl handle
-      except OSError:
-        echo "wash: command not found: ", cmd
+    
+    if res.promptPrinted:
+      promptPrinted = true
 
 
 # main entry
