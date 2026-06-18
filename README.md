@@ -1,4 +1,9 @@
-# wash.exe -- Windows Advanced Shell
+<div align="center">
+  <img src="./assets/washicon.png">
+  <h1>wash.exe</h1>
+  <p>Windows Advanced Shell</p>
+</div>
+
 
 ```text
                                    $$\                                        
@@ -11,12 +16,11 @@
   \_____\____/  \_______|\_______/ \__|  \__|\__|\_______|\__/  \__| \_______|
 ```
 
-***
+
 
 > 💡 **We need donation!** If my project is of great help to you, consider donating:
 > 👉 **[https://washdotexe.sfkgr.me](https://washdotexe.sfkgr.me)**
 
-***
 
 > ⚠️ **IMPORTANT NOTICE**
 > The project is still under active development. It has not yet reached a stage of stable availability.
@@ -68,6 +72,55 @@ winget install Sifware.WashDotExe
 **Scoop:**
 ```cmd
 scoop install washdotexe
+```
+
+***
+
+## 🛠️ BUILDING FROM SOURCE
+
+### Prerequisites
+
+1. Install **Nim 2.0+** (Ensure `nim` is in your `PATH`).
+2. Install `mingw`.
+
+### Compilation Commands
+
+We use custom Nim tasks for different scenarios. Run these commands at the root directory of the project:
+
+#### 1. Development Build
+Fast compilation with debug info, output to `build/washdev.exe`:
+```bash
+nim dev
+```
+
+If you want to **compile and run immediately** with Windows resources embedded:
+
+```bash
+nim dev -d:res -d:run
+```
+
+#### 2. Release Build (Standard)
+
+Optimized for production, output to `build/wash.exe`:
+
+```bash
+nim release
+```
+
+#### 3. Advanced Optimization Modes (Release Only)
+
+You can pass compilation profiles via `-d:Mode` to get a customized binary size and speed:
+
+| Command | Optimization Mode | Description |
+| --- | --- | --- |
+| `nim release -d:speed` | **Speed Profile** | Prioritizes runtime execution speed (`--opt:speed`). |
+| `nim release -d:min` | **Size Profile** | Optimizes for smaller binary size with LTO and strip. |
+| `nim release -d:minx` | **Extreme Size Profile** | Uses aggressive GCC flags (`-Oz`, gc-sections, etc.) to squeeze the binary into the absolute minimum footprint. |
+
+*Example for an extreme-size production release with icons embedded:*
+
+```bash
+nim release -d:minx -d:res
 ```
 
 ***
